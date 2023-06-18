@@ -65,6 +65,7 @@ class CountryKlashaApplicationTests {
             String request, HttpStatus expectedStatus,  String expectedContent) throws Exception {
         doGet(request)
                 .andExpect(status().is(expectedStatus.value()));
+
                 // .andExpect(content().string(expectedContent));
     }
 
