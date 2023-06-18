@@ -1,1 +1,1 @@
-web: java -jar target/country-klasha-1.0.0-SNAPSHOT.jar
+web: java -jar target/country-klasha-0.0.1-SNAPSHOT.jar
