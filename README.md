@@ -38,13 +38,17 @@ The project is built using the following technologies and frameworks:
 
 Automated tests have been implemented to ensure the correctness and reliability of the application. These tests cover various components and functionalities.
 
-## Additional Improvements
+## Improvements
 
 In addition to the core functionality, the following improvements have been implemented:
 
 1. **Parallel Function Execution:** RxJava operators have been used to enable parallel execution of functions, reducing response time and improving performance.
 
-2. **Cache Mechanism:** To further enhance response time, a cache mechanism such as Redis could be integrated. By caching frequently accessed data, the application can retrieve it quickly without performing expensive computations or database queries.
+## Additional Improvements
+
+In addition to the core functionality, the following improvements would have been implemented:
+
+1. **Cache Mechanism:** To further enhance response time, a cache mechanism such as Redis could be integrated. By caching frequently accessed data, the application can retrieve it quickly without performing expensive computations or database queries.
 
 
 ## Contributing
