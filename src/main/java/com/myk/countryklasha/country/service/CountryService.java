@@ -118,7 +118,7 @@ public class CountryService {
         ).subscribeOn(Schedulers.io()).observeOn(Schedulers.single());
     }
 
-    public Single<SuccessResponse> currencyValue(String countryCurrency, String target_currency, BigDecimal amount) {
+    private Single<SuccessResponse> currencyValue(String countryCurrency, String target_currency, BigDecimal amount) {
         Map<String, BigDecimal> exchange_rate = Map.of(
                 "EUR-NGN", BigDecimal.valueOf(493.06),
                 "USD-NGN", BigDecimal.valueOf(460.72),
