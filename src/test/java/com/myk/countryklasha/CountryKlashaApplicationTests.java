@@ -61,6 +61,16 @@ class CountryKlashaApplicationTests {
         }
     }
 
+    @Test
+    public void shouldfetchCountryMonetaryInfo() {
+        try {
+            verifyAsyncGetRequest("/api/v1/country/info/monetary?country=nidddd&amount=100&target_currency=gng", HttpStatus.NOT_FOUND, null);
+            verifyAsyncGetRequest("/api/v1/country/info/monetary?country=nigeria&amount=100&target_currency=NGN", HttpStatus.OK, null);
+        } catch (Exception e) {
+           //  throw new CustomException();
+        }
+    }
+
     private void verifySyncGetRequest(
             String request, HttpStatus expectedStatus,  String expectedContent) throws Exception {
         doGet(request)

@@ -31,6 +31,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(response);
     }
 
+    @ExceptionHandler(CustomException.class)
+    protected ResponseEntity<Object> handleCustomException(CustomException ex) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(HttpStatus.BAD_REQUEST);
+        response.setMessage("Validation error: " + ex.getMessage());
+        response.setDebugMessage(ex.debugMessage);
+        return buildResponseEntity(response);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
                                                                       WebRequest request) {

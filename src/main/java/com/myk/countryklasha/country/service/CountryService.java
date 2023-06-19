@@ -1,12 +1,11 @@
 package com.myk.countryklasha.country.service;
 
+import com.myk.countryklasha.common.CustomException;
 import com.myk.countryklasha.common.RetrofitConfig;
 import com.myk.countryklasha.common.SuccessResponse;
+import com.myk.countryklasha.country.domain.payload.CountryCitiesPopulationPayload;
 import com.myk.countryklasha.country.domain.payload.CountryPayload;
 import com.myk.countryklasha.country.domain.response.CountryCitiesResponse;
-import com.myk.countryklasha.country.domain.payload.CountryCitiesPopulationPayload;
-import com.myk.countryklasha.country.domain.response.CountryResponse;
-import com.myk.countryklasha.country.domain.response.StateResponse;
 import com.myk.countryklasha.country.dto.CountryInfoDto;
 import com.myk.countryklasha.country.dto.PopulationResponseDto;
 import io.reactivex.rxjava3.core.Single;
@@ -15,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import retrofit2.HttpException;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -33,9 +34,9 @@ public class CountryService {
             var ghana = new CountryCitiesPopulationPayload(limit, "dsc", "value", "Ghana");
 
             return Single.zip(
-                            retrofitConfig.countryClient().fetchTopCities(italy),
-                            retrofitConfig.countryClient().fetchTopCities(newZealand),
-                            retrofitConfig.countryClient().fetchTopCities(ghana),
+                            retrofitConfig.countryClient().fetchTopCities(italy).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchTopCities(newZealand).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchTopCities(ghana).subscribeOn(Schedulers.newThread()),
                             (a, b, c) -> {
                                 var response = new SuccessResponse();
                                 response.success = true;
@@ -52,11 +53,11 @@ public class CountryService {
             var payload = new CountryPayload(country);
 
             return Single.zip(
-                            retrofitConfig.countryClient().fetchPopulation(payload),
-                            retrofitConfig.countryClient().fetchCapital(payload),
-                            retrofitConfig.countryClient().fetchPosition(payload),
-                            retrofitConfig.countryClient().fetchCurrency(payload),
-                            retrofitConfig.countryClient().fetchIso(payload),
+                            retrofitConfig.countryClient().fetchPopulation(payload).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchCapital(payload).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchPosition(payload).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchCurrency(payload).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchIso(payload).subscribeOn(Schedulers.newThread()),
                             (a, b, c, d, e) -> {
                                 // log.info("a: {}", a);
                                 var response = new SuccessResponse();
@@ -103,17 +104,47 @@ public class CountryService {
                     ).subscribeOn(Schedulers.io()).observeOn(Schedulers.single());
     }
 
-    public Single<Map<String, String>> fetchCountryMonetaryInfo(String country, int amount)  {
-            var payload = new CountryPayload(country);
-            return Single.zip(
-                            retrofitConfig.countryClient().fetchCurrency(payload),
-                            retrofitConfig.exchangeClient().fetchCountryMonetary(),
-                            (a, b) -> Map.of(
-                                    "currency", "a.data",
-                                    "iso", " b.data"
-                            )
-                    ).subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.single());
+    public Single<SuccessResponse> fetchCountryMonetaryInfo(String country, BigDecimal amount, String target_currency) {
+        var payload = new CountryPayload(country);
+        return retrofitConfig.countryClient().fetchCurrency(payload).flatMap(
+                currencyResponse -> {
+                    if (!List.of("USD", "EUR", "JPY", "GBP").contains(currencyResponse.data.getCurrency())) {
+                        return Single.error(new CustomException(String.format(
+                                "Country monetary info not available for %s", currencyResponse.data.getCurrency()
+                        ), HttpStatus.BAD_REQUEST, "Country monetary info not available"));
+                    }
+                    return currencyValue(currencyResponse.data.getCurrency(), target_currency, amount);
+                }
+        ).subscribeOn(Schedulers.io()).observeOn(Schedulers.single());
+    }
+
+    public Single<SuccessResponse> currencyValue(String countryCurrency, String target_currency, BigDecimal amount) {
+        Map<String, BigDecimal> exchange_rate = Map.of(
+                "EUR-NGN", BigDecimal.valueOf(493.06),
+                "USD-NGN", BigDecimal.valueOf(460.72),
+                "JPY-NGN", BigDecimal.valueOf(3.28),
+                "GBP-NGN", BigDecimal.valueOf(570.81),
+                "EUR-UGX", BigDecimal.valueOf(4.00),
+                "USD-UGX", BigDecimal.valueOf(3.00),
+                "JPY-UGX", BigDecimal.valueOf(26.62),
+                "GBP-UGX", BigDecimal.valueOf(4.00)
+
+        );
+
+
+        var currencyValue = amount.divide(
+                exchange_rate.get(String.format("%s-%s", countryCurrency, target_currency)), 2, RoundingMode.UP
+        ).doubleValue();
+        var response = new SuccessResponse();
+        response.success = true;
+        response.message = "Country monetary info fetched successfully";
+        response.data = Map.of(
+                "country_currency", countryCurrency,
+                "target_currency", target_currency,
+                "amount", currencyValue
+        );
+
+        return Single.just(response);
     }
 
 }
