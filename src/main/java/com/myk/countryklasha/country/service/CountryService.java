@@ -134,7 +134,7 @@ public class CountryService {
 
         var currencyValue = amount.divide(
                 exchange_rate.get(String.format("%s-%s", countryCurrency, target_currency)), 2, RoundingMode.UP
-        ).doubleValue();
+        );
         var response = new SuccessResponse();
         response.success = true;
         response.message = "Country monetary info fetched successfully";
