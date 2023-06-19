@@ -1,7 +1,9 @@
 package com.myk.countryklasha.common;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.UnexpectedTypeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -57,6 +59,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         response.setMessage(ex.getMessage());
         return buildResponseEntity(response);
     }
+
+    @ExceptionHandler(UnexpectedTypeException.class)
+    protected ResponseEntity<Object> handleConstraintViolation(UnexpectedTypeException ex) {
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        response.setMessage(ex.getMessage());
+        return buildResponseEntity(response);
+    }
+
 
 
 
