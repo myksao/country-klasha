@@ -34,7 +34,7 @@ public class CountryController {
     private final CountryService countryService;
 
     @GetMapping(path = "{limit}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Single<SuccessResponse>> fetchTopCities(@PathVariable("limit") @Min(2) @NotBlank int limit)  {
+    public ResponseEntity<Single<SuccessResponse>> fetchTopCities(@PathVariable("limit") @Min(2) int limit)  {
         var data = this.countryService.fetchTopCities(limit);
         return ResponseEntity.status(HttpStatus.OK).body(data);
     }
