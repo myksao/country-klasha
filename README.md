@@ -20,7 +20,7 @@ The Country Information Fetcher is a backend application developed using Spring 
 
 ## Introduction
 
-This project is a demonstration of a backend application developed using Spring Boot and Java. It provides [brief description of what the application does].
+This project is a demonstration of a backend application developed using Spring Boot and Java
 
 ## Technologies
 
