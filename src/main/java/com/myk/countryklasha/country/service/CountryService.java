@@ -34,9 +34,9 @@ public class CountryService {
             var ghana = new CountryCitiesPopulationPayload(limit, "dsc", "value", "Ghana");
 
             return Single.zip(
-                            retrofitConfig.countryClient().fetchTopCities(italy).subscribeOn(Schedulers.newThread()),
-                            retrofitConfig.countryClient().fetchTopCities(newZealand).subscribeOn(Schedulers.newThread()),
-                            retrofitConfig.countryClient().fetchTopCities(ghana).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchTopCities(italy),
+                            retrofitConfig.countryClient().fetchTopCities(newZealand),
+                            retrofitConfig.countryClient().fetchTopCities(ghana),
                             (a, b, c) -> {
                                 var response = new SuccessResponse();
                                 response.success = true;
@@ -53,11 +53,11 @@ public class CountryService {
             var payload = new CountryPayload(country);
 
             return Single.zip(
-                            retrofitConfig.countryClient().fetchPopulation(payload).subscribeOn(Schedulers.newThread()),
-                            retrofitConfig.countryClient().fetchCapital(payload).subscribeOn(Schedulers.newThread()),
-                            retrofitConfig.countryClient().fetchPosition(payload).subscribeOn(Schedulers.newThread()),
-                            retrofitConfig.countryClient().fetchCurrency(payload).subscribeOn(Schedulers.newThread()),
-                            retrofitConfig.countryClient().fetchIso(payload).subscribeOn(Schedulers.newThread()),
+                            retrofitConfig.countryClient().fetchPopulation(payload),
+                            retrofitConfig.countryClient().fetchCapital(payload),
+                            retrofitConfig.countryClient().fetchPosition(payload),
+                            retrofitConfig.countryClient().fetchCurrency(payload),
+                            retrofitConfig.countryClient().fetchIso(payload),
                             (a, b, c, d, e) -> {
                                 // log.info("a: {}", a);
                                 var response = new SuccessResponse();
